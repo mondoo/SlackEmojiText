@@ -264,6 +264,7 @@ const formatSlackString = (inStr) => {
 		"9": ":nine:",
 		"?": ":question:",
 		"!": ":exclamation:",
+		"\"": ":':",
 		"'": ":':",
 		",": ":comma:",
 		"-": ":heavy_minus_sign:"
@@ -275,14 +276,51 @@ const formatSlackString = (inStr) => {
 		"rob": ":ascendatanium:"
 	};
 
+	let punctuation = [
+		".", ",", ";", "!", "?", "'", "\"", "-"
+	];
+
 	let output = toEmojis(inStr, characterMap);
 
 	Object.keys(brands).forEach((brand) => {
 		const strToReplace = toEmojis(brand, characterMap);
 		output = output.replace(new RegExp(strToReplace, "g"), (match, idx) => {
-			if (idx == 0 || (output[idx - 1] == " " && (!output[strToReplace.length + idx + 1] || output[strToReplace.length + idx + 1] == " "))) {
+			let punctuationPrevValidation = false;
+			let punctuationNextValidation = false;
+			for (let i = 0; i < punctuation.length; i++) {
+				const punctuationEmoji = toEmojis(punctuation[i], characterMap);
+				const prevPunctuationSlice = output.slice(idx - punctuationEmoji.length, idx);
+				const nextPunctuationSlice = output.slice(strToReplace.length + idx, strToReplace.length + idx + punctuationEmoji.length);
+
+				if (prevPunctuationSlice == punctuationEmoji) {
+					punctuationPrevValidation = true;
+				}
+
+				if(nextPunctuationSlice == punctuationEmoji) {
+					punctuationNextValidation = true;
+				}
+
+				if (punctuationPrevValidation && punctuationNextValidation) {
+					break;
+				}
+			}
+
+			if (idx == 0 && !output[strToReplace.length + idx + 1]) {
 				return brands[brand];
 			}
+			else if (punctuationPrevValidation && punctuationNextValidation) {
+				return brands[brand];
+			}
+			else if (punctuationPrevValidation && (!output[strToReplace.length + idx + 1] || output[strToReplace.length + idx + 1] == " ")) {
+				return brands[brand];
+			}
+			else if (punctuationNextValidation && (!output[idx - 1] || output[idx - 1] == " ")) {
+				return brands[brand];
+			}
+			else if ((!output[idx - 1] || output[idx - 1] == " ") && (!output[strToReplace.length + idx + 1] || output[strToReplace.length + idx + 1] == " ")) {
+				return brands[brand];
+			}
+
 			return strToReplace;
 		});
 	});
