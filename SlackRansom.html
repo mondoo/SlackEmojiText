@@ -235,8 +235,20 @@ const toEmojis = (inStr, inCharMap) => {
 	return output;
 }
 
+const validationCheck = (inArr) => {
+	if (!Array.isArray(inArr)) {
+		return false;
+	}
+	for (let i = 0; i < inArr.length; i++) {
+		if (inArr[i]) {
+			return true;
+		}
+	}
+	return false;
+} 
+
 const formatSlackString = (inStr) => {
-	let characterMap = {
+	const characterMap = {
 		" ": "     ",
 		"c": ":croissant:",
 		"d": ":eggplant:",
@@ -270,13 +282,13 @@ const formatSlackString = (inStr) => {
 		"-": ":heavy_minus_sign:"
 	};
 
-	let brands = {
+	const brands = {
 		"subway": ":subway1::subway2::subway3:",
 		"greggs": ":greggs1::greggs2:",
 		"rob": ":ascendatanium:"
 	};
 
-	let punctuation = [
+	const punctuation = [
 		".", ",", ";", "!", "?", "'", "\"", "-"
 	];
 
@@ -305,23 +317,13 @@ const formatSlackString = (inStr) => {
 				}
 			}
 
-			if (idx == 0 && !output[strToReplace.length + idx + 1]) {
-				return brands[brand];
-			}
-			else if (punctuationPrevValidation && punctuationNextValidation) {
-				return brands[brand];
-			}
-			else if (punctuationPrevValidation && (!output[strToReplace.length + idx + 1] || output[strToReplace.length + idx + 1] == " ")) {
-				return brands[brand];
-			}
-			else if (punctuationNextValidation && (!output[idx - 1] || output[idx - 1] == " ")) {
-				return brands[brand];
-			}
-			else if ((!output[idx - 1] || output[idx - 1] == " ") && (!output[strToReplace.length + idx + 1] || output[strToReplace.length + idx + 1] == " ")) {
-				return brands[brand];
-			}
-
-			return strToReplace;
+			return validationCheck([
+				idx == 0 && !output[strToReplace.length + idx + 1],
+				punctuationPrevValidation && punctuationNextValidation,
+				punctuationPrevValidation && (!output[strToReplace.length + idx + 1] || output[strToReplace.length + idx + 1] == " "),
+				punctuationNextValidation && (!output[idx - 1] || output[idx - 1] == " "),
+				(!output[idx - 1] || output[idx - 1] == " ") && (!output[strToReplace.length + idx + 1] || output[strToReplace.length + idx + 1] == " ")
+			]) ? brands[brand] : strToReplace;
 		});
 	});
 
