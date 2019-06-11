@@ -1,11 +1,17 @@
 class SlackRansom {
     constructor(input, output, characterMap, brands, punctuation) {
-        this.input = input;
-        this.output = output;
-        this.characterMap = characterMap;
-        this.brands = brands;
-        this.punctuation = punctuation;
-        this.bindInput();
+        this.$inputField = document.querySelector(input);
+        this.$outputField = document.querySelector(output);
+
+        if (!this.$inputField || !this.$outputField) {
+            console.log(`${!this.$inputField ? `"${input}" could not be found in the DOM` : ""} ${!this.$outputField ? `${!this.$inputField ? "\n" : ""}"${output}" could not be found in the DOM` : ""}`);
+        }
+        else {
+            this.characterMap = characterMap;
+            this.brands = brands;
+            this.punctuation = punctuation;
+            this.bindInput();
+        }
     }
 
     toEmojis(inStr) {
@@ -76,12 +82,9 @@ class SlackRansom {
     }
 
     bindInput() {
-        let $inputField = document.querySelector(this.input);
-        let $outputField = document.querySelector(this.output);
-    
-        if ($inputField && $outputField) {
-            $inputField.addEventListener('input', (evt) => {
-                $outputField.innerHTML = this.formatSlackString(evt.target.value);
+        if (this.$inputField && this.$outputField) {
+            this.$inputField.addEventListener('input', (evt) => {
+                this.$outputField.innerHTML = this.formatSlackString(evt.target.value);
             });
         }
     }
