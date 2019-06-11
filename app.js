@@ -82,10 +82,8 @@ class SlackRansom {
     }
 
     bindInput() {
-        if (this.$inputField && this.$outputField) {
-            this.$inputField.addEventListener('input', (evt) => {
-                this.$outputField.innerHTML = this.formatSlackString(evt.target.value);
-            });
-        }
+        this.$inputField.addEventListener('input', (evt) => {
+            this.$outputField.innerHTML = this.formatSlackString(evt.target.value);
+        });
     }
 }
