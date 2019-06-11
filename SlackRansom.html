@@ -282,12 +282,14 @@ const formatSlackString = (inStr) => {
 		"-": ":heavy_minus_sign:"
 	};
 
+	// Update funky shizz you want
 	const brands = {
 		"subway": ":subway1::subway2::subway3:",
 		"greggs": ":greggs1::greggs2:",
 		"rob": ":ascendatanium:"
 	};
 
+	// Left out colon as it needs to be mapped before the check
 	const punctuation = [
 		".", ",", ";", "!", "?", "'", "\"", "-"
 	];
@@ -330,12 +332,12 @@ const formatSlackString = (inStr) => {
 	return output;
 }
 
-let inputField = document.querySelector(".textToConvert");
-let outputField = document.querySelector(".outputText");
+let $inputField = document.querySelector(".textToConvert");
+let $outputField = document.querySelector(".outputText");
 
-if (inputField && outputField) {
-	inputField.addEventListener('input', (evt) => {
-		outputField.innerHTML = formatSlackString(evt.target.value);
+if ($inputField && $outputField) {
+	$inputField.addEventListener('input', (evt) => {
+		$outputField.innerHTML = formatSlackString(evt.target.value);
 	});
 }
 </script>
