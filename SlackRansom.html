@@ -278,7 +278,13 @@ const formatSlackString = (inStr) => {
 	let output = toEmojis(inStr, characterMap);
 
 	Object.keys(brands).forEach((brand) => {
-		output = output.replace(new RegExp(toEmojis(brand, characterMap), "g"), brands[brand]);
+		const strToReplace = toEmojis(brand, characterMap);
+		output = output.replace(new RegExp(toEmojis(brand, characterMap), "g"), (match, idx) => {
+			if (index == 0 || (output[idx - 1] == " " && (!output[strToReplace.length + idx + 1] || output[strToReplace.length + idx + 1] == " "))) {
+				return brands[brand];
+			}
+			return strToReplace;
+		});
 	});
 
 	return output;
