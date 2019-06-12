@@ -1,5 +1,5 @@
 class SlackRansom {
-    constructor(input, output, characterMap, brands, punctuation) {
+    constructor(input, output, data) {
         this.$inputField = document.querySelector(input);
         this.$outputField = document.querySelector(output);
 
@@ -7,9 +7,9 @@ class SlackRansom {
             console.log(`${!this.$inputField ? `"${input}" could not be found in the DOM` : ""} ${!this.$outputField ? `${!this.$inputField ? "\n" : ""}"${output}" could not be found in the DOM` : ""}`);
         }
         else {
-            this.characterMap = characterMap;
-            this.brands = brands;
-            this.punctuation = punctuation;
+            this.characterMap = data.characterMap;
+            this.brands = data.brands;
+            this.punctuation = data.punctuation;
             this.bindInput();
         }
     }
