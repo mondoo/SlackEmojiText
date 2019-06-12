@@ -10,25 +10,26 @@ class SlackRansom {
             this.characterMap = data.characterMap;
             this.brands = data.brands;
             this.punctuation = data.punctuation;
+            this.output;
             this.bindInput();
         }
     }
 
     toEmojis(inStr) {
         let alphaNumericRegex = /[a-z0-9]/i;
-        let output = "";
+        let outputStr = "";
         for (let i = 0; i < inStr.length; i++) {
             if (this.characterMap[inStr[i].toLowerCase()]) {
-                output += this.characterMap[inStr[i].toLowerCase()];
+                outputStr += this.characterMap[inStr[i].toLowerCase()];
             }
             else if (alphaNumericRegex.test(inStr[i])) {
-                output += `:${inStr[i].toLowerCase()}:`;
+                outputStr += `:${inStr[i].toLowerCase()}:`;
             }
             else {
-                output += inStr[i];
+                outputStr += inStr[i];
             }
         }
-        return output;
+        return outputStr;
     }
 
     validationCheck(inArr) {
@@ -44,46 +45,46 @@ class SlackRansom {
     }
 
     formatSlackString(inStr) {
-        let output = this.toEmojis(inStr);
+        this.output = this.toEmojis(inStr);
         Object.keys(this.brands).forEach((brand) => {
             const strToReplace = this.toEmojis(brand);
-            output = output.replace(new RegExp(strToReplace, "g"), (match, idx) => {
-                let punctuationPrevValidation = false;
-                let punctuationNextValidation = false;
+            this.output = this.output.replace(new RegExp(strToReplace, "g"), (match, idx) => {
+                let punctuationValidation = [false, false];
                 for (let i = 0; i < this.punctuation.length; i++) {
                     const punctuationEmoji = this.toEmojis(this.punctuation[i]);
-                    const prevPunctuationSlice = output.slice(idx - punctuationEmoji.length, idx);
-                    const nextPunctuationSlice = output.slice(strToReplace.length + idx, strToReplace.length + idx + punctuationEmoji.length);
-    
-                    if (prevPunctuationSlice == punctuationEmoji) {
-                        punctuationPrevValidation = true;
+                    const punctuationSlice = [
+                        this.output.slice(idx - punctuationEmoji.length, idx),
+                        this.output.slice(strToReplace.length + idx, strToReplace.length + idx + punctuationEmoji.length)
+                    ];
+
+                    if (punctuationSlice[0] == punctuationEmoji) {
+                        punctuationValidation[0] = true;
                     }
     
-                    if(nextPunctuationSlice == punctuationEmoji) {
-                        punctuationNextValidation = true;
+                    if (punctuationSlice[1] == punctuationEmoji) {
+                        punctuationValidation[1] = true;
                     }
     
-                    if (punctuationPrevValidation && punctuationNextValidation) {
+                    if (punctuationValidation[0] && punctuationValidation[1]) {
                         break;
                     }
                 }
     
                 return this.validationCheck([
-                    idx == 0 && !output[strToReplace.length + idx + 1],
-                    punctuationPrevValidation && punctuationNextValidation,
-                    punctuationPrevValidation && (!output[strToReplace.length + idx + 1] || output[strToReplace.length + idx + 1] == " "),
-                    punctuationNextValidation && (!output[idx - 1] || output[idx - 1] == " "),
-                    (!output[idx - 1] || output[idx - 1] == " ") && (!output[strToReplace.length + idx + 1] || output[strToReplace.length + idx + 1] == " ")
+                    idx == 0 && !this.output[strToReplace.length + idx + 1],
+                    punctuationValidation[0] && punctuationValidation[1],
+                    punctuationValidation[0] && (!this.output[strToReplace.length + idx + 1] || this.output[strToReplace.length + idx + 1] == " "),
+                    punctuationValidation[1] && (!this.output[idx - 1] || this.output[idx - 1] == " "),
+                    (!this.output[idx - 1] || this.output[idx - 1] == " ") && (!this.output[strToReplace.length + idx + 1] || this.output[strToReplace.length + idx + 1] == " ")
                 ]) ? this.brands[brand] : strToReplace;
             });
         });
-    
-        return output;
     }
 
     bindInput() {
         this.$inputField.addEventListener('input', (evt) => {
-            this.$outputField.innerHTML = this.formatSlackString(evt.target.value);
+            this.formatSlackString(evt.target.value);
+            this.$outputField.innerHTML = this.output;
         });
     }
 }
